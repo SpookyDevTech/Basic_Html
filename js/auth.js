@@ -7,6 +7,8 @@ const DEMO_USERS = {
         role: 'admin',
         name: 'Bank Administrator',
         id: 'admin-001',
+        email: 'admin@securebank.com',
+        phone: '+1234567890',
         permissions: ['all']
     },
     'manager': {
@@ -14,6 +16,8 @@ const DEMO_USERS = {
         role: 'bank_manager',
         name: 'Branch Manager',
         id: 'manager-001',
+        email: 'manager@securebank.com',
+        phone: '+1234567891',
         permissions: ['dashboard', 'customers', 'loans', 'applications', 'reports', 'loan_approval']
     },
     'officer': {
@@ -21,6 +25,8 @@ const DEMO_USERS = {
         role: 'loan_officer',
         name: 'Loan Officer',
         id: 'officer-001',
+        email: 'officer@securebank.com',
+        phone: '+1234567892',
         permissions: ['dashboard', 'customers', 'applications', 'calculator', 'loan_processing']
     },
     'customer': {
@@ -28,9 +34,14 @@ const DEMO_USERS = {
         role: 'customer',
         name: 'John Customer',
         id: 'customer-001',
+        email: 'customer@securebank.com',
+        phone: '+1234567893',
         permissions: ['dashboard', 'calculator', 'applications']
     }
 };
+
+// Registered users storage (in addition to demo users)
+let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || {};
 
 // Authentication state
 let currentUser = null;
@@ -59,23 +70,49 @@ function setupEventListeners() {
         loginForm.addEventListener('submit', handleLogin);
     }
 
-    // Toggle password visibility
+    // Register form submission
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+    }
+
+    // Toggle password visibility for login
     const togglePassword = document.getElementById('togglePassword');
     if (togglePassword) {
         togglePassword.addEventListener('click', function() {
-            const passwordField = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            togglePasswordVisibility('password', this);
         });
+    }
+
+    // Toggle password visibility for register
+    const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+    if (toggleRegisterPassword) {
+        toggleRegisterPassword.addEventListener('click', function() {
+            togglePasswordVisibility('registerPassword', this);
+        });
+    }
+
+    // Toggle confirm password visibility
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    if (toggleConfirmPassword) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            togglePasswordVisibility('confirmPassword', this);
+        });
+    }
+}
+
+function togglePasswordVisibility(fieldId, toggleButton) {
+    const passwordField = document.getElementById(fieldId);
+    const icon = toggleButton.querySelector('i');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
     }
 }
 
@@ -92,8 +129,9 @@ function handleLogin(event) {
         return;
     }
     
-    // Check credentials
-    const user = DEMO_USERS[username];
+    // Check credentials in demo users first, then registered users
+    let user = DEMO_USERS[username] || registeredUsers[username];
+    
     if (!user || user.password !== password) {
         showAlert('Invalid username or password', 'danger');
         return;
@@ -104,6 +142,8 @@ function handleLogin(event) {
         id: user.id,
         username: username,
         name: user.name,
+        email: user.email,
+        phone: user.phone,
         role: user.role,
         permissions: user.permissions,
         loginTime: new Date().toISOString()
@@ -124,6 +164,107 @@ function handleLogin(event) {
     }, 1000);
 }
 
+function handleRegister(event) {
+    event.preventDefault();
+    
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const username = document.getElementById('registerUsername').value.trim();
+    const phone = document.getElementById('registerPhone').value.trim();
+    const accountType = document.getElementById('accountType').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const acceptTerms = document.getElementById('acceptTerms').checked;
+    
+    // Validate input
+    if (!firstName || !lastName || !email || !username || !phone || !accountType || !password || !confirmPassword) {
+        showAlert('Please fill in all required fields', 'danger');
+        return;
+    }
+    
+    if (!acceptTerms) {
+        showAlert('Please accept the Terms of Service and Privacy Policy', 'danger');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showAlert('Passwords do not match', 'danger');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showAlert('Password must be at least 6 characters long', 'danger');
+        return;
+    }
+    
+    if (username.length < 3) {
+        showAlert('Username must be at least 3 characters long', 'danger');
+        return;
+    }
+    
+    // Check if username already exists
+    if (DEMO_USERS[username] || registeredUsers[username]) {
+        showAlert('Username already exists. Please choose a different username.', 'danger');
+        return;
+    }
+    
+    // Check if email already exists
+    const existingUser = Object.values({...DEMO_USERS, ...registeredUsers}).find(user => user.email === email);
+    if (existingUser) {
+        showAlert('Email address already registered. Please use a different email.', 'danger');
+        return;
+    }
+    
+    // Generate user ID
+    const userId = `user-${Date.now()}`;
+    
+    // Set permissions based on account type
+    let permissions = ['dashboard'];
+    switch (accountType) {
+        case 'customer':
+            permissions = ['dashboard', 'calculator', 'applications'];
+            break;
+        case 'loan_officer':
+            permissions = ['dashboard', 'customers', 'applications', 'calculator', 'loan_processing'];
+            break;
+        case 'bank_manager':
+            permissions = ['dashboard', 'customers', 'loans', 'applications', 'reports', 'loan_approval'];
+            break;
+    }
+    
+    // Create new user
+    const newUser = {
+        password: password,
+        role: accountType,
+        name: `${firstName} ${lastName}`,
+        id: userId,
+        email: email,
+        phone: phone,
+        permissions: permissions,
+        registrationDate: new Date().toISOString()
+    };
+    
+    // Add to registered users
+    registeredUsers[username] = newUser;
+    
+    // Save to localStorage
+    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    
+    // Success message and redirect to login
+    showAlert('Account created successfully! Please log in with your credentials.', 'success');
+    
+    // Clear the form
+    document.getElementById('registerForm').reset();
+    
+    // Switch to login page after brief delay
+    setTimeout(() => {
+        showLoginPage();
+        // Pre-fill username for convenience
+        document.getElementById('email').value = username;
+    }, 2000);
+}
+
 function logout() {
     // Clear user session
     localStorage.removeItem('currentUser');
@@ -137,6 +278,7 @@ function logout() {
 
 function showLoginPage() {
     document.getElementById('loginPage').classList.remove('d-none');
+    document.getElementById('registerPage').classList.add('d-none');
     document.getElementById('mainApp').classList.add('d-none');
     
     // Clear form
@@ -146,8 +288,21 @@ function showLoginPage() {
     }
 }
 
+function showRegisterPage() {
+    document.getElementById('loginPage').classList.add('d-none');
+    document.getElementById('registerPage').classList.remove('d-none');
+    document.getElementById('mainApp').classList.add('d-none');
+    
+    // Clear form
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.reset();
+    }
+}
+
 function showMainApp() {
     document.getElementById('loginPage').classList.add('d-none');
+    document.getElementById('registerPage').classList.add('d-none');
     document.getElementById('mainApp').classList.remove('d-none');
     
     // Update user display name
@@ -161,7 +316,7 @@ function showMainApp() {
 }
 
 function showForgotPassword() {
-    showAlert('For demo purposes, use the provided demo credentials.', 'info');
+    showAlert('For demo purposes, use the provided demo credentials or create a new account.', 'info');
 }
 
 function hasPermission(permission) {
@@ -263,5 +418,7 @@ window.auth = {
     requirePermission,
     logout,
     showAlert,
-    quickLogin
+    quickLogin,
+    showLoginPage,
+    showRegisterPage
 }; 
