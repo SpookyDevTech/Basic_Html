@@ -84,6 +84,10 @@
                                 <div class="text-center">
                                     <a href="#" class="text-decoration-none" onclick="showForgotPassword()">Forgot Password?</a>
                                 </div>
+                                
+                                <div class="text-center mt-3">
+                                    <p class="mb-0">Don't have an account? <a href="#" class="text-decoration-none" onclick="showRegisterPage()">Sign up here</a></p>
+                                </div>
                             </form>
                             
                             <!-- Demo Credentials -->
@@ -107,6 +111,150 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="container-fluid vh-100 d-none">
+        <div class="row h-100">
+            <!-- Left Side - Branding -->
+            <div class="col-lg-6 d-none d-lg-flex bg-success text-white flex-column justify-content-center align-items-center">
+                <div class="text-center">
+                    <i class="fas fa-user-plus fa-5x mb-4"></i>
+                    <h1 class="display-4 fw-bold mb-3">Join SecureBank</h1>
+                    <p class="lead">Create your account and start managing loans</p>
+                    <div class="row mt-5">
+                        <div class="col-4">
+                            <div class="feature-box">
+                                <i class="fas fa-rocket fa-2x mb-2"></i>
+                                <h6>Quick Setup</h6>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-box">
+                                <i class="fas fa-handshake fa-2x mb-2"></i>
+                                <h6>Trusted</h6>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-box">
+                                <i class="fas fa-clock fa-2x mb-2"></i>
+                                <h6>24/7 Support</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Register Form -->
+            <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                <div class="w-100" style="max-width: 450px;">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                                <h3 class="card-title">Create Your Account</h3>
+                                <p class="text-muted">Fill in your details to get started.</p>
+                            </div>
+                            
+                            <form id="registerForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="firstName" required placeholder="First name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="lastName" required placeholder="Last name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="registerEmail" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="registerEmail" required placeholder="Enter email address">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="registerUsername" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                        <input type="text" class="form-control" id="registerUsername" required placeholder="Choose username" minlength="3">
+                                    </div>
+                                    <small class="text-muted">Username must be at least 3 characters long</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="registerPhone" class="form-label">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        <input type="tel" class="form-control" id="registerPhone" required placeholder="Enter phone number">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="accountType" class="form-label">Account Type</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                        <select class="form-control" id="accountType" required>
+                                            <option value="">Select Account Type</option>
+                                            <option value="customer">Customer</option>
+                                            <option value="loan_officer">Loan Officer</option>
+                                            <option value="bank_manager">Bank Manager</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="registerPassword" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="registerPassword" required minlength="6">
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleRegisterPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Password must be at least 6 characters long</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="acceptTerms" required>
+                                    <label class="form-check-label" for="acceptTerms">
+                                        I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-success w-100 mb-3">
+                                    <i class="fas fa-user-plus me-2"></i>Create Account
+                                </button>
+                                
+                                <div class="text-center">
+                                    <p class="mb-0">Already have an account? <a href="#" class="text-decoration-none" onclick="showLoginPage()">Sign in here</a></p>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
